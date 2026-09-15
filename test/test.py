@@ -77,3 +77,44 @@ async def test_programmed_pin0_pulse_has_exact_width(dut):
         await ReadOnly()
         assert (int(dut.uio_out.value) & 1) == expected
         assert dut.uio_oe.value == 0x01
+
+
+@cocotb.test()
+async def test_firmware_transmits_uart_8n1_byte(dut):
+    """Firmware alone must transmit 0x55 as a cycle-exact UART 8N1 frame."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    bit_ticks = 4
+    wait_operand = bit_ticks - 2
+    frame_bits = [0] + [(0x55 >> bit) & 1 for bit in range(8)] + [1]
+
+    # Configure TX pin 0 as an output and establish one idle-high bit period.
+    firmware = [0x2001, 0x1001, 0x3000 | wait_operand]
+    for bit in frame_bits:
+        firmware.extend((0x1000 | bit, 0x3000 | wait_operand))
+    firmware.append(0xF000)
+
+    for instruction in firmware:
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+
+    # Retire OE, then hold the idle-high level for exactly one bit period.
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert dut.uio_oe.value == 0x01
+    assert dut.uio_out.value == 0x00
+
+    for _ in range(bit_ticks):
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        assert (int(dut.uio_out.value) & 1) == 1
+
+    # Start, eight data bits LSB-first, and one stop bit.
+    for expected_bit in frame_bits:
+        for _ in range(bit_ticks):
+            await RisingEdge(dut.clk)
+            await ReadOnly()
+            assert (int(dut.uio_out.value) & 1) == expected_bit
+            assert dut.uio_oe.value == 0x01
