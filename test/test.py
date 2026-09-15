@@ -3,7 +3,7 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles, RisingEdge
+from cocotb.triggers import ClockCycles, ReadOnly, RisingEdge
 
 
 CLOCK_PERIOD_US = 1
@@ -47,3 +47,33 @@ async def test_loaded_out_instruction_drives_protocol_pins(dut):
 
     assert dut.uio_out.value == 0xA5
     assert dut.uio_oe.value == 0x00
+
+
+@cocotb.test()
+async def test_programmed_pin0_pulse_has_exact_width(dut):
+    """OE/OUT/WAIT must produce a three-clock enabled-high pulse."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # OE pin 0, raise pin 0, wait one additional tick, lower pin 0, halt.
+    for instruction in (0x2001, 0x1001, 0x3001, 0x1000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    # Configuration must not drive protocol pins.
+    assert dut.uio_out.value == 0x00
+    assert dut.uio_oe.value == 0x00
+
+    dut.ui_in.value = 1 << 3
+
+    # OE retires first, then OUT raises the pin.
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert dut.uio_oe.value == 0x01
+    assert dut.uio_out.value == 0x00
+
+    expected_pin0 = (1, 1, 1, 0)
+    for expected in expected_pin0:
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        assert (int(dut.uio_out.value) & 1) == expected
+        assert dut.uio_oe.value == 0x01
