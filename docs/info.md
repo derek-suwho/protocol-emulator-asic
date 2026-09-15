@@ -1,20 +1,23 @@
-<!---
-
-This file is used to generate your project datasheet. Please fill in the information below and delete any unused
-sections.
-
-You can also include images in this folder and reference them in the markdown. Each image must be less than
-512 kb in size, and the combined size of all images must be less than 1 MB.
--->
-
 ## How it works
 
-Explain how your project works
+The Programmable Protocol Emulator is a small deterministic processor optimized
+for cycle-accurate digital pin control. A host loads compact instructions through
+a synchronous serial configuration interface, then asserts `run`. The processor
+executes instructions that drive, sample, wait on, and change the direction of
+eight bidirectional protocol pins. Protocol behavior is firmware rather than
+fixed RTL, allowing the same silicon to implement UART, SPI, I2C, and other
+timing-compatible interfaces.
 
 ## How to test
 
-Explain how to use your project
+Hold `run` low and reset the design. Shift the program into instruction memory
+with `cfg_data` and `cfg_shift`; pulse `cfg_commit` after each complete instruction.
+Assert `run` to begin execution. Observe `protocol_io_0` through
+`protocol_io_7` and the status output while applying any required protocol input
+stimulus. Exact instruction encoding and reference UART, SPI, and I2C programs
+will be documented as the implementation stabilizes.
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+No external hardware is required for simulation. FPGA and fabricated-silicon
+testing will use level-compatible loopback wiring and a logic analyzer.

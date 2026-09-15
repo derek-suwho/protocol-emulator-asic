@@ -1,6 +1,10 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# Programmable Protocol Emulator ASIC
+
+An open-source deterministic protocol engine for the Jane Street protocol
+emulator ASIC competition. The same compact processor is intended to implement
+UART, SPI, I2C, and other digital protocols in firmware.
 
 - [Read the documentation for project](docs/info.md)
 
