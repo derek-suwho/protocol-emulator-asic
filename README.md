@@ -6,7 +6,8 @@ An open-source deterministic protocol engine for the Jane Street protocol
 emulator ASIC competition. The same compact processor is intended to implement
 UART, SPI, I2C, and other digital protocols in firmware.
 
-- [Read the documentation for project](docs/info.md)
+- [Read the generated project documentation](docs/info.md)
+- [Read the architecture and draft instruction-set specification](docs/architecture.md)
 
 ## What is Tiny Tapeout?
 
