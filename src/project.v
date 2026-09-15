@@ -19,7 +19,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] OP_OUT  = 4'h1;
   localparam [3:0] OP_HALT = 4'hf;
 
-  reg [15:0] program [0:63];
+  reg [15:0] imem [0:63];
   reg [15:0] cfg_shift_reg;
   reg [5:0]  cfg_addr;
   reg [5:0]  pc;
@@ -52,13 +52,13 @@ module tt_um_derek_su_protocol_emulator (
         cfg_shift_reg <= {cfg_data, cfg_shift_reg[15:1]};
 
       if (cfg_commit) begin
-        program[cfg_addr] <= cfg_shift_reg;
+        imem[cfg_addr] <= cfg_shift_reg;
         cfg_addr <= cfg_addr + 1'b1;
       end
     end else if (ena && !halted) begin
-      case (program[pc][15:12])
+      case (imem[pc][15:12])
         OP_OUT: begin
-          pin_out <= program[pc][7:0];
+          pin_out <= imem[pc][7:0];
           pc <= pc + 1'b1;
         end
         OP_HALT: begin
