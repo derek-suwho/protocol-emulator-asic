@@ -23,6 +23,9 @@ jobs:
         shell: bash
         run: pip install -r test/requirements.txt
 
+      - name: Run assembler unit tests
+        run: python -m pytest test/test_assembler.py -q
+
       - name: Run tests
         run: |
           cd test

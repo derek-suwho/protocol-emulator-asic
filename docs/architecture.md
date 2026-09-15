@@ -1,6 +1,6 @@
 # Protocol Emulator Architecture
 
-Status: draft v0.2 — the loader plus `OUT`, `OE`, `WAIT`, and `HALT` are implemented and tested.
+Status: draft v0.2 — the loader plus `OUT`, `OE`, `WAIT`, and `HALT` are implemented and tested. A firmware-only UART transmitter has produced a verified 8N1 frame for byte `0x55` with exact four-clock bit periods.
 
 ## Design goals
 

@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: © 2026 Derek Su
+# SPDX-License-Identifier: Apache-2.0
+
+import pytest
+
+from tools.assembler import halt, oe, out, uart_tx8n1, wait
+
+
+def test_encodes_v02_instructions():
+    assert out(0xA5) == 0x10A5
+    assert oe(0x81) == 0x2081
+    assert wait(0) == 0x3000
+    assert wait(0xFFF) == 0x3FFF
+    assert halt() == 0xF000
+
+
+@pytest.mark.parametrize(
+    ("encoder", "operand"),
+    [
+        (out, -1),
+        (out, 0x100),
+        (oe, -1),
+        (oe, 0x100),
+        (wait, -1),
+        (wait, 0x1000),
+    ],
+)
+def test_rejects_operands_that_do_not_fit(encoder, operand):
+    with pytest.raises(ValueError):
+        encoder(operand)
+
+
+def test_generates_uart_8n1_firmware_for_runtime_selected_byte():
+    program = uart_tx8n1(0x55, tx_mask=0x01, bit_ticks=4)
+
+    frame_bits = [0] + [(0x55 >> bit) & 1 for bit in range(8)] + [1]
+    expected = [oe(0x01), out(0x01), wait(2)]
+    for bit in frame_bits:
+        expected.extend((out(bit), wait(2)))
+    expected.append(halt())
+
+    assert program == expected
+    assert len(program) <= 64
+
+
+@pytest.mark.parametrize("bit_ticks", [0, 1])
+def test_uart_rejects_bit_period_too_short_for_out_wait_pair(bit_ticks):
+    with pytest.raises(ValueError):
+        uart_tx8n1(0x55, tx_mask=0x01, bit_ticks=bit_ticks)
