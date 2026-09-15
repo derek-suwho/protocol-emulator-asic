@@ -1,6 +1,6 @@
 # Protocol Emulator Architecture
 
-Status: draft v0.1 — the loader plus `OUT` and `HALT` are implemented and tested.
+Status: draft v0.2 — the loader plus `OUT`, `OE`, `WAIT`, and `HALT` are implemented and tested.
 
 ## Design goals
 
@@ -62,7 +62,7 @@ changes.
 | `E` | reserved | — | Reserved for verification-driven extensions |
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 
-Only `OUT` and `HALT` are frozen in v0.1. Every additional opcode will be added
+`OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. Every additional opcode will be added
 through a failing behavioral test before RTL implementation.
 
 ## Verification sequence
