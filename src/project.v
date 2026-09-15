@@ -17,12 +17,15 @@ module tt_um_derek_su_protocol_emulator (
 );
 
   localparam [3:0] OP_OUT  = 4'h1;
+  localparam [3:0] OP_OE   = 4'h2;
+  localparam [3:0] OP_WAIT = 4'h3;
   localparam [3:0] OP_HALT = 4'hf;
 
   reg [15:0] imem [0:63];
   reg [15:0] cfg_shift_reg;
   reg [5:0]  cfg_addr;
   reg [5:0]  pc;
+  reg [11:0] wait_count;
   reg [7:0]  pin_out;
   reg [7:0]  pin_oe;
   reg        halted;
@@ -41,11 +44,13 @@ module tt_um_derek_su_protocol_emulator (
       cfg_shift_reg <= 16'b0;
       cfg_addr       <= 6'b0;
       pc             <= 6'b0;
+      wait_count     <= 12'b0;
       pin_out        <= 8'b0;
       pin_oe         <= 8'b0;
       halted         <= 1'b0;
     end else if (!run) begin
       pc     <= 6'b0;
+      wait_count <= 12'b0;
       halted <= 1'b0;
 
       if (cfg_shift)
@@ -55,10 +60,20 @@ module tt_um_derek_su_protocol_emulator (
         imem[cfg_addr] <= cfg_shift_reg;
         cfg_addr <= cfg_addr + 1'b1;
       end
+    end else if (ena && !halted && (wait_count != 0)) begin
+      wait_count <= wait_count - 1'b1;
     end else if (ena && !halted) begin
       case (imem[pc][15:12])
         OP_OUT: begin
           pin_out <= imem[pc][7:0];
+          pc <= pc + 1'b1;
+        end
+        OP_OE: begin
+          pin_oe <= imem[pc][7:0];
+          pc <= pc + 1'b1;
+        end
+        OP_WAIT: begin
+          wait_count <= imem[pc][11:0];
           pc <= pc + 1'b1;
         end
         OP_HALT: begin
