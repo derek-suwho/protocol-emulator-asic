@@ -1,10 +1,11 @@
 # Protocol Emulator Architecture
 
 Status: draft v0.3 — the loader plus `OUT`, `OE`, `WAIT`, `IN`, `LDI`,
-`HOST`, `ALU XOR`, `JMP`, `JZ`, `JNZ`, `OUTA`, and `HALT` are implemented and tested.
-Firmware can sample an external or host byte, transform it with XOR-immediate,
-and later drive the retained value onto the protocol pins. A firmware-only UART transmitter has
-produced a verified 8N1 frame for byte `0x55` with exact four-clock bit periods.
+`HOST`, `ALU XOR`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `OUTA`, and `HALT` are
+implemented and tested. Firmware can sample an external or host byte, transform
+it with XOR-immediate or logical shift-right, and later drive the retained value
+onto the protocol pins. A firmware-only UART transmitter has produced a verified
+8N1 frame for byte `0x55` with exact four-clock bit periods.
 
 ## Design goals
 
@@ -56,7 +57,7 @@ changes.
 | `4` | `IN` | — | Sample protocol inputs into accumulator |
 | `5` | `LDI imm8` | `[7:0]` | Load accumulator immediate |
 | `6` | `HOST` | — | Sample host input byte into accumulator |
-| `7` | `ALU fn,imm8` | `[11:8]`, `[7:0]` | Transform accumulator; function `2` is XOR-immediate |
+| `7` | `ALU fn,imm8` | `[11:8]`, `[7:0]` | Transform accumulator; function `2` is XOR-immediate and function `5` is logical shift-right by `[2:0]` |
 | `8` | `JMP addr6` | `[5:0]` | Unconditional branch |
 | `9` | `JZ addr6` | `[5:0]` | Branch when accumulator is zero |
 | `A` | `JNZ addr6` | `[5:0]` | Branch when accumulator is nonzero |
@@ -67,8 +68,9 @@ changes.
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 
 `OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. `IN`, `LDI`, `ALU XOR`,
-`HOST`, `JMP`, `JZ`, `JNZ`, and `OUTA` are implemented in draft v0.3. Every additional operation
-will be added through a failing behavioral test before RTL implementation.
+`HOST`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, and `OUTA` are implemented in draft
+v0.3. Every additional operation will be added through a failing behavioral test
+before RTL implementation.
 Unimplemented ALU function values advance the PC without changing the
 accumulator.
 

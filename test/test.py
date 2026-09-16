@@ -201,6 +201,23 @@ async def test_alu_xor_immediate_updates_accumulator(dut):
 
 
 @cocotb.test()
+async def test_alu_shift_right_immediate_updates_accumulator(dut):
+    """ALU SHR-immediate must logically shift the accumulator for later output."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0xA5; ALU SHR,1; OUTA; HALT.
+    for instruction in (0x50A5, 0x7501, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0x52
+
+
+@cocotb.test()
 async def test_jmp_skips_intervening_instruction(dut):
     """JMP must continue execution at its six-bit absolute target."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
