@@ -50,6 +50,11 @@ def jz(address: int) -> int:
     return 0x9000 | _checked(address, 6, "JZ address")
 
 
+def jnz(address: int) -> int:
+    """Encode JNZ addr6."""
+    return 0xA000 | _checked(address, 6, "JNZ address")
+
+
 def outa() -> int:
     """Encode OUTA."""
     return 0xC000
