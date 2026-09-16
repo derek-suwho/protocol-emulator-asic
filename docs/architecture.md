@@ -1,6 +1,10 @@
 # Protocol Emulator Architecture
 
-Status: draft v0.2 — the loader plus `OUT`, `OE`, `WAIT`, and `HALT` are implemented and tested. A firmware-only UART transmitter has produced a verified 8N1 frame for byte `0x55` with exact four-clock bit periods.
+Status: draft v0.3 — the loader plus `OUT`, `OE`, `WAIT`, `IN`, `LDI`,
+`OUTA`, and `HALT` are implemented and tested. Firmware can sample an external
+byte into the accumulator and later drive that retained value onto the protocol
+pins. A firmware-only UART transmitter has produced a verified 8N1 frame for
+byte `0x55` with exact four-clock bit periods.
 
 ## Design goals
 
@@ -62,8 +66,9 @@ changes.
 | `E` | reserved | — | Reserved for verification-driven extensions |
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 
-`OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. Every additional opcode will be added
-through a failing behavioral test before RTL implementation.
+`OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. `IN`, `LDI`, and `OUTA` are
+implemented in draft v0.3. Every additional opcode will be added through a
+failing behavioral test before RTL implementation.
 
 ## Verification sequence
 

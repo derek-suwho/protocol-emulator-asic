@@ -19,6 +19,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] OP_OUT  = 4'h1;
   localparam [3:0] OP_OE   = 4'h2;
   localparam [3:0] OP_WAIT = 4'h3;
+  localparam [3:0] OP_IN   = 4'h4;
   localparam [3:0] OP_LDI  = 4'h5;
   localparam [3:0] OP_OUTA = 4'hc;
   localparam [3:0] OP_HALT = 4'hf;
@@ -80,6 +81,10 @@ module tt_um_derek_su_protocol_emulator (
           wait_count <= imem[pc][11:0];
           pc <= pc + 1'b1;
         end
+        OP_IN: begin
+          accumulator <= uio_in;
+          pc <= pc + 1'b1;
+        end
         OP_LDI: begin
           accumulator <= imem[pc][7:0];
           pc <= pc + 1'b1;
@@ -98,6 +103,6 @@ module tt_um_derek_su_protocol_emulator (
     end
   end
 
-  wire _unused = &{uio_in, ui_in[7:4], 1'b0};
+  wire _unused = &{ui_in[7:4], 1'b0};
 
 endmodule

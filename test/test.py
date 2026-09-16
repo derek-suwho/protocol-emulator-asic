@@ -3,7 +3,7 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles, ReadOnly, RisingEdge
+from cocotb.triggers import ClockCycles, ReadOnly, RisingEdge, Timer
 
 
 CLOCK_PERIOD_US = 1
@@ -136,5 +136,27 @@ async def test_ldi_and_outa_drive_accumulator_value(dut):
     assert dut.uio_out.value == 0x00
 
     await RisingEdge(dut.clk)  # OUTA
+    await ReadOnly()
+    assert dut.uio_out.value == 0xA5
+
+
+@cocotb.test()
+async def test_in_samples_protocol_pins_for_later_firmware_output(dut):
+    """IN must retain one pin sample in the accumulator for a later OUTA."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    for instruction in (0x4000, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.uio_in.value = 0xA5
+    dut.ui_in.value = 1 << 3
+    await RisingEdge(dut.clk)  # IN samples 0xA5.
+    await ReadOnly()
+    assert dut.uio_out.value == 0x00
+
+    await Timer(1, unit="ns")
+    dut.uio_in.value = 0x3C  # Prove OUTA uses the retained sample, not live pins.
+    await RisingEdge(dut.clk)
     await ReadOnly()
     assert dut.uio_out.value == 0xA5

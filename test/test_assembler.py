@@ -3,7 +3,7 @@
 
 import pytest
 
-from tools.assembler import halt, ldi, oe, out, outa, uart_tx8n1, wait
+from tools.assembler import halt, inp, ldi, oe, out, outa, uart_tx8n1, wait
 
 
 def test_encodes_v02_instructions():
@@ -14,7 +14,8 @@ def test_encodes_v02_instructions():
     assert halt() == 0xF000
 
 
-def test_encodes_accumulator_output_instructions():
+def test_encodes_accumulator_data_instructions():
+    assert inp() == 0x4000
     assert ldi(0xA5) == 0x50A5
     assert outa() == 0xC000
 
