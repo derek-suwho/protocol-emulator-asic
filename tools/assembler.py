@@ -45,6 +45,11 @@ def jmp(address: int) -> int:
     return 0x8000 | _checked(address, 6, "JMP address")
 
 
+def jz(address: int) -> int:
+    """Encode JZ addr6."""
+    return 0x9000 | _checked(address, 6, "JZ address")
+
+
 def outa() -> int:
     """Encode OUTA."""
     return 0xC000

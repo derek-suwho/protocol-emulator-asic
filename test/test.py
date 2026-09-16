@@ -194,3 +194,20 @@ async def test_jmp_skips_intervening_instruction(dut):
     await ReadOnly()
 
     assert dut.uio_out.value == 0xA5
+
+
+@cocotb.test()
+async def test_jz_branches_when_accumulator_is_zero(dut):
+    """JZ must continue at its absolute target when the accumulator is zero."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0; JZ 4; OUT 0x22 (skipped); HALT; OUT 0xA5; HALT.
+    for instruction in (0x5000, 0x9004, 0x1022, 0xF000, 0x10A5, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xA5
