@@ -40,6 +40,11 @@ def alu_xor(value: int) -> int:
     return 0x7200 | _checked(value, 8, "ALU XOR operand")
 
 
+def jmp(address: int) -> int:
+    """Encode JMP addr6."""
+    return 0x8000 | _checked(address, 6, "JMP address")
+
+
 def outa() -> int:
     """Encode OUTA."""
     return 0xC000

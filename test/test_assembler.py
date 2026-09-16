@@ -3,7 +3,7 @@
 
 import pytest
 
-from tools.assembler import alu_xor, halt, inp, ldi, oe, out, outa, uart_tx8n1, wait
+from tools.assembler import alu_xor, halt, inp, jmp, ldi, oe, out, outa, uart_tx8n1, wait
 
 
 def test_encodes_v02_instructions():
@@ -18,6 +18,7 @@ def test_encodes_accumulator_data_instructions():
     assert inp() == 0x4000
     assert ldi(0xA5) == 0x50A5
     assert alu_xor(0xFF) == 0x72FF
+    assert jmp(0x3F) == 0x803F
     assert outa() == 0xC000
 
 
@@ -34,6 +35,8 @@ def test_encodes_accumulator_data_instructions():
         (ldi, 0x100),
         (alu_xor, -1),
         (alu_xor, 0x100),
+        (jmp, -1),
+        (jmp, 0x40),
     ],
 )
 def test_rejects_operands_that_do_not_fit(encoder, operand):

@@ -22,6 +22,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] OP_IN   = 4'h4;
   localparam [3:0] OP_LDI  = 4'h5;
   localparam [3:0] OP_ALU  = 4'h7;
+  localparam [3:0] OP_JMP  = 4'h8;
   localparam [3:0] OP_OUTA = 4'hc;
   localparam [3:0] OP_HALT = 4'hf;
 
@@ -96,6 +97,9 @@ module tt_um_derek_su_protocol_emulator (
           if (imem[pc][11:8] == ALU_XOR)
             accumulator <= accumulator ^ imem[pc][7:0];
           pc <= pc + 1'b1;
+        end
+        OP_JMP: begin
+          pc <= imem[pc][5:0];
         end
         OP_OUTA: begin
           pin_out <= accumulator;
