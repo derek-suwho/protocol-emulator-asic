@@ -3,7 +3,7 @@
 
 import pytest
 
-from tools.assembler import halt, oe, out, uart_tx8n1, wait
+from tools.assembler import halt, ldi, oe, out, outa, uart_tx8n1, wait
 
 
 def test_encodes_v02_instructions():
@@ -12,6 +12,11 @@ def test_encodes_v02_instructions():
     assert wait(0) == 0x3000
     assert wait(0xFFF) == 0x3FFF
     assert halt() == 0xF000
+
+
+def test_encodes_accumulator_output_instructions():
+    assert ldi(0xA5) == 0x50A5
+    assert outa() == 0xC000
 
 
 @pytest.mark.parametrize(
@@ -23,6 +28,8 @@ def test_encodes_v02_instructions():
         (oe, 0x100),
         (wait, -1),
         (wait, 0x1000),
+        (ldi, -1),
+        (ldi, 0x100),
     ],
 )
 def test_rejects_operands_that_do_not_fit(encoder, operand):

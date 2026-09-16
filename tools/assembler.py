@@ -25,6 +25,16 @@ def wait(additional_ticks: int) -> int:
     return 0x3000 | _checked(additional_ticks, 12, "WAIT operand")
 
 
+def ldi(value: int) -> int:
+    """Encode LDI imm8."""
+    return 0x5000 | _checked(value, 8, "LDI operand")
+
+
+def outa() -> int:
+    """Encode OUTA."""
+    return 0xC000
+
+
 def halt() -> int:
     """Encode HALT."""
     return 0xF000

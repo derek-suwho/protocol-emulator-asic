@@ -19,6 +19,8 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] OP_OUT  = 4'h1;
   localparam [3:0] OP_OE   = 4'h2;
   localparam [3:0] OP_WAIT = 4'h3;
+  localparam [3:0] OP_LDI  = 4'h5;
+  localparam [3:0] OP_OUTA = 4'hc;
   localparam [3:0] OP_HALT = 4'hf;
 
   reg [15:0] imem [0:63];
@@ -28,6 +30,7 @@ module tt_um_derek_su_protocol_emulator (
   reg [11:0] wait_count;
   reg [7:0]  pin_out;
   reg [7:0]  pin_oe;
+  reg [7:0]  accumulator;
   reg        halted;
 
   wire cfg_data   = ui_in[0];
@@ -47,6 +50,7 @@ module tt_um_derek_su_protocol_emulator (
       wait_count     <= 12'b0;
       pin_out        <= 8'b0;
       pin_oe         <= 8'b0;
+      accumulator    <= 8'b0;
       halted         <= 1'b0;
     end else if (!run) begin
       pc     <= 6'b0;
@@ -74,6 +78,14 @@ module tt_um_derek_su_protocol_emulator (
         end
         OP_WAIT: begin
           wait_count <= imem[pc][11:0];
+          pc <= pc + 1'b1;
+        end
+        OP_LDI: begin
+          accumulator <= imem[pc][7:0];
+          pc <= pc + 1'b1;
+        end
+        OP_OUTA: begin
+          pin_out <= accumulator;
           pc <= pc + 1'b1;
         end
         OP_HALT: begin

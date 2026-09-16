@@ -118,3 +118,23 @@ async def test_firmware_transmits_uart_8n1_byte(dut):
             await ReadOnly()
             assert (int(dut.uio_out.value) & 1) == expected_bit
             assert dut.uio_oe.value == 0x01
+
+
+@cocotb.test()
+async def test_ldi_and_outa_drive_accumulator_value(dut):
+    """LDI must load the accumulator and OUTA must copy it to protocol pins."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    for instruction in (0x50A5, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+
+    await RisingEdge(dut.clk)  # LDI
+    await ReadOnly()
+    assert dut.uio_out.value == 0x00
+
+    await RisingEdge(dut.clk)  # OUTA
+    await ReadOnly()
+    assert dut.uio_out.value == 0xA5
