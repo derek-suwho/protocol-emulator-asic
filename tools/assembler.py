@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: © 2026 Derek Su
 # SPDX-License-Identifier: Apache-2.0
 
-"""Assembler helpers for the verified Protocol Emulator v0.2 ISA."""
+"""Assembler helpers for the verified Protocol Emulator ISA."""
 
 
 def _checked(value: int, bits: int, name: str) -> int:
@@ -33,6 +33,11 @@ def inp() -> int:
 def ldi(value: int) -> int:
     """Encode LDI imm8."""
     return 0x5000 | _checked(value, 8, "LDI operand")
+
+
+def alu_xor(value: int) -> int:
+    """Encode ALU XOR,imm8."""
+    return 0x7200 | _checked(value, 8, "ALU XOR operand")
 
 
 def outa() -> int:

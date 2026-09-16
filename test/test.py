@@ -160,3 +160,20 @@ async def test_in_samples_protocol_pins_for_later_firmware_output(dut):
     await RisingEdge(dut.clk)
     await ReadOnly()
     assert dut.uio_out.value == 0xA5
+
+
+@cocotb.test()
+async def test_alu_xor_immediate_updates_accumulator(dut):
+    """ALU XOR-immediate must update the accumulator consumed by OUTA."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0xA5; ALU XOR,0xFF; OUTA; HALT.
+    for instruction in (0x50A5, 0x72FF, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0x5A

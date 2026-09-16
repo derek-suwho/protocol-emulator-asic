@@ -1,10 +1,10 @@
 # Protocol Emulator Architecture
 
 Status: draft v0.3 — the loader plus `OUT`, `OE`, `WAIT`, `IN`, `LDI`,
-`OUTA`, and `HALT` are implemented and tested. Firmware can sample an external
-byte into the accumulator and later drive that retained value onto the protocol
-pins. A firmware-only UART transmitter has produced a verified 8N1 frame for
-byte `0x55` with exact four-clock bit periods.
+`ALU XOR`, `OUTA`, and `HALT` are implemented and tested. Firmware can sample
+an external byte, transform it with XOR-immediate, and later drive the retained
+value onto the protocol pins. A firmware-only UART transmitter has produced a
+verified 8N1 frame for byte `0x55` with exact four-clock bit periods.
 
 ## Design goals
 
@@ -56,7 +56,7 @@ changes.
 | `4` | `IN` | — | Sample protocol inputs into accumulator |
 | `5` | `LDI imm8` | `[7:0]` | Load accumulator immediate |
 | `6` | `HOST` | — | Sample host input byte into accumulator |
-| `7` | `ALU fn,imm8` | `[11:8]`, `[7:0]` | AND/OR/XOR/add/subtract/shift accumulator |
+| `7` | `ALU fn,imm8` | `[11:8]`, `[7:0]` | Transform accumulator; function `2` is XOR-immediate |
 | `8` | `JMP addr6` | `[5:0]` | Unconditional branch |
 | `9` | `JZ addr6` | `[5:0]` | Branch when accumulator is zero |
 | `A` | `JNZ addr6` | `[5:0]` | Branch when accumulator is nonzero |
@@ -66,9 +66,10 @@ changes.
 | `E` | reserved | — | Reserved for verification-driven extensions |
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 
-`OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. `IN`, `LDI`, and `OUTA` are
-implemented in draft v0.3. Every additional opcode will be added through a
-failing behavioral test before RTL implementation.
+`OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. `IN`, `LDI`, `ALU XOR`, and
+`OUTA` are implemented in draft v0.3. Every additional operation will be added
+through a failing behavioral test before RTL implementation. Unimplemented ALU
+function values advance the PC without changing the accumulator.
 
 ## Verification sequence
 
