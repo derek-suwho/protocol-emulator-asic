@@ -163,6 +163,27 @@ async def test_in_samples_protocol_pins_for_later_firmware_output(dut):
 
 
 @cocotb.test()
+async def test_host_samples_runtime_byte_for_later_firmware_output(dut):
+    """HOST must retain one host byte in the accumulator for a later OUTA."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    for instruction in (0x6000, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 0xAD  # run=1 and runtime host byte 0xAD.
+    await RisingEdge(dut.clk)  # HOST samples 0xAD.
+    await ReadOnly()
+    assert dut.uio_out.value == 0x00
+
+    await Timer(1, unit="ns")
+    dut.ui_in.value = 0x5B  # Prove OUTA uses the retained byte, not live ui_in.
+    await RisingEdge(dut.clk)
+    await ReadOnly()
+    assert dut.uio_out.value == 0xAD
+
+
+@cocotb.test()
 async def test_alu_xor_immediate_updates_accumulator(dut):
     """ALU XOR-immediate must update the accumulator consumed by OUTA."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())

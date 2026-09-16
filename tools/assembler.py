@@ -35,6 +35,11 @@ def ldi(value: int) -> int:
     return 0x5000 | _checked(value, 8, "LDI operand")
 
 
+def host() -> int:
+    """Encode HOST."""
+    return 0x6000
+
+
 def alu_xor(value: int) -> int:
     """Encode ALU XOR,imm8."""
     return 0x7200 | _checked(value, 8, "ALU XOR operand")
@@ -68,9 +73,8 @@ def halt() -> int:
 def uart_tx8n1(byte: int, *, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[int]:
     """Build unrolled firmware that transmits one UART 8N1 byte.
 
-    The current v0.2 ISA has no runtime data registers, so the selected byte is
-    compiled into OUT immediates. The line idles high for one bit period before
-    the start bit and remains high after HALT.
+    The selected byte is compiled into OUT immediates. The line idles high for
+    one bit period before the start bit and remains high after HALT.
     """
     byte = _checked(byte, 8, "UART byte")
     tx_mask = _checked(tx_mask, 8, "TX mask")

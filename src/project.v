@@ -21,6 +21,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] OP_WAIT = 4'h3;
   localparam [3:0] OP_IN   = 4'h4;
   localparam [3:0] OP_LDI  = 4'h5;
+  localparam [3:0] OP_HOST = 4'h6;
   localparam [3:0] OP_ALU  = 4'h7;
   localparam [3:0] OP_JMP  = 4'h8;
   localparam [3:0] OP_JZ   = 4'h9;
@@ -93,6 +94,10 @@ module tt_um_derek_su_protocol_emulator (
         end
         OP_LDI: begin
           accumulator <= imem[pc][7:0];
+          pc <= pc + 1'b1;
+        end
+        OP_HOST: begin
+          accumulator <= ui_in;
           pc <= pc + 1'b1;
         end
         OP_ALU: begin
