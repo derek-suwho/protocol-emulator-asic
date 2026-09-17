@@ -289,6 +289,23 @@ async def test_alu_shift_right_immediate_updates_accumulator(dut):
 
 
 @cocotb.test()
+async def test_alu_rotate_right_immediate_preserves_shifted_out_bits(dut):
+    """ALU ROR-immediate must wrap shifted-out bits back into the accumulator."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0x81; ALU ROR,1; OUTA; HALT. Rotation produces 0xC0, unlike SHR's 0x40.
+    for instruction in (0x5081, 0x7701, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xC0
+
+
+@cocotb.test()
 async def test_alu_and_immediate_masks_accumulator(dut):
     """ALU AND-immediate must mask the accumulator for later output."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())

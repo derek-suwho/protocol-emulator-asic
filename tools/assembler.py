@@ -75,6 +75,11 @@ def alu_sub(value: int) -> int:
     return 0x7600 | _checked(value, 8, "ALU SUB operand")
 
 
+def alu_ror(amount: int) -> int:
+    """Encode ALU rotate-right by a three-bit immediate."""
+    return 0x7700 | _checked(amount, 3, "ALU ROR operand")
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")
