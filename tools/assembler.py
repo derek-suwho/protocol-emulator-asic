@@ -150,6 +150,11 @@ def outa() -> int:
     return 0xC000
 
 
+def outbit(pin: int) -> int:
+    """Encode OUTBIT pin (copy accumulator bit zero to one output pin)."""
+    return 0xD000 | _checked(pin, 3, "OUTBIT pin")
+
+
 def halt() -> int:
     """Encode HALT."""
     return 0xF000

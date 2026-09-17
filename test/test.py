@@ -476,6 +476,23 @@ async def test_alu_shift_left_immediate_updates_accumulator(dut):
 
 
 @cocotb.test()
+async def test_outbit_copies_accumulator_lsb_to_selected_output(dut):
+    """OUTBIT must update one selected output without disturbing other pins."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # OUT 0xA0; LDI 1; OUTBIT pin 2; HALT. Only pin 2 should be added.
+    for instruction in (0x10A0, 0x5001, 0xD002, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xA4
+
+
+@cocotb.test()
 async def test_jmp_skips_intervening_instruction(dut):
     """JMP must continue execution at its six-bit absolute target."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
