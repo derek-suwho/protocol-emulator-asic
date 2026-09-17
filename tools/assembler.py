@@ -80,6 +80,11 @@ def alu_ror(amount: int) -> int:
     return 0x7700 | _checked(amount, 3, "ALU ROR operand")
 
 
+def alu_rol(amount: int) -> int:
+    """Encode ALU rotate-left by a three-bit immediate."""
+    return 0x7800 | _checked(amount, 3, "ALU ROL operand")
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")
