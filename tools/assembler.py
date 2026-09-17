@@ -80,6 +80,16 @@ def jnz(address: int) -> int:
     return 0xA000 | _checked(address, 6, "JNZ address")
 
 
+def jpin(pin: int, value: int, address: int) -> int:
+    """Encode JPIN pin,value,addr6."""
+    return (
+        0xB000
+        | (_checked(pin, 3, "JPIN pin") << 9)
+        | (_checked(value, 1, "JPIN value") << 8)
+        | _checked(address, 6, "JPIN address")
+    )
+
+
 def outa() -> int:
     """Encode OUTA."""
     return 0xC000

@@ -317,3 +317,22 @@ async def test_jnz_branches_when_accumulator_is_nonzero(dut):
     await ReadOnly()
 
     assert dut.uio_out.value == 0xA5
+
+
+@cocotb.test()
+async def test_jpin_branches_when_selected_protocol_pin_matches(dut):
+    """JPIN must branch when the selected live protocol pin matches its value."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # JPIN pin 2,high,3; OUT 0x22; HALT; OUT 0xA5; HALT.
+    # Encoding: opcode B, pin in [11:9], value in [8], target in [5:0].
+    for instruction in (0xB503, 0x1022, 0xF000, 0x10A5, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.uio_in.value = 1 << 2
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 2)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xA5

@@ -1,7 +1,7 @@
 # Protocol Emulator Architecture
 
 Status: draft v0.3 — the loader plus `OUT`, `OE`, `WAIT`, `IN`, `LDI`,
-`HOST`, `ALU AND`, `ALU OR`, `ALU XOR`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `OUTA`, and `HALT` are
+`HOST`, `ALU AND`, `ALU OR`, `ALU XOR`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `JPIN`, `OUTA`, and `HALT` are
 implemented and tested. Firmware can sample an external or host byte, transform
 it with AND-immediate, OR-immediate, XOR-immediate, or logical shifts, and later drive the retained value
 onto the protocol pins. A firmware-only UART transmitter has produced a verified
@@ -61,14 +61,14 @@ changes.
 | `8` | `JMP addr6` | `[5:0]` | Unconditional branch |
 | `9` | `JZ addr6` | `[5:0]` | Branch when accumulator is zero |
 | `A` | `JNZ addr6` | `[5:0]` | Branch when accumulator is nonzero |
-| `B` | `JPIN pin,value,addr6` | TBD | Branch on a sampled protocol pin |
+| `B` | `JPIN pin,value,addr6` | `[11:9]`, `[8]`, `[5:0]` | Branch when the selected live protocol pin matches `value` |
 | `C` | `OUTA` | — | Copy accumulator to protocol output register |
 | `D` | reserved | — | Reserved for host synchronization or timing extensions |
 | `E` | reserved | — | Reserved for verification-driven extensions |
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 
 `OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. `IN`, `LDI`, `ALU XOR`,
-`HOST`, `ALU AND`, `ALU OR`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, and `OUTA` are implemented in draft
+`HOST`, `ALU AND`, `ALU OR`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `JPIN`, and `OUTA` are implemented in draft
 v0.3. Every additional operation will be added through a failing behavioral test
 before RTL implementation.
 Unimplemented ALU function values advance the PC without changing the
