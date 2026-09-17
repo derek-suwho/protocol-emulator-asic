@@ -40,6 +40,11 @@ def host() -> int:
     return 0x6000
 
 
+def alu_and(value: int) -> int:
+    """Encode ALU AND,imm8."""
+    return 0x7000 | _checked(value, 8, "ALU AND operand")
+
+
 def alu_xor(value: int) -> int:
     """Encode ALU XOR,imm8."""
     return 0x7200 | _checked(value, 8, "ALU XOR operand")
