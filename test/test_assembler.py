@@ -3,7 +3,7 @@
 
 import pytest
 
-from tools.assembler import alu_add, alu_and, alu_or, alu_shl, alu_shr, alu_xor, halt, host, inp, jmp, jnz, jpin, jz, ldi, oe, out, outa, uart_tx8n1, wait
+from tools.assembler import alu_add, alu_and, alu_or, alu_shl, alu_shr, alu_sub, alu_xor, halt, host, inp, jmp, jnz, jpin, jz, ldi, oe, out, outa, uart_tx8n1, wait
 
 
 def test_encodes_v02_instructions():
@@ -24,6 +24,7 @@ def test_encodes_accumulator_data_instructions():
     assert alu_add(0x07) == 0x7307
     assert alu_shl(1) == 0x7401
     assert alu_shr(1) == 0x7501
+    assert alu_sub(0x07) == 0x7607
     assert jmp(0x3F) == 0x803F
     assert jz(0x3F) == 0x903F
     assert jnz(0x3F) == 0xA03F
@@ -54,6 +55,8 @@ def test_encodes_accumulator_data_instructions():
         (alu_shl, 8),
         (alu_shr, -1),
         (alu_shr, 8),
+        (alu_sub, -1),
+        (alu_sub, 0x100),
         (jmp, -1),
         (jmp, 0x40),
         (jz, -1),

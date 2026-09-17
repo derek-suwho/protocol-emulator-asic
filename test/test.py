@@ -218,6 +218,23 @@ async def test_alu_add_immediate_wraps_accumulator(dut):
 
 
 @cocotb.test()
+async def test_alu_sub_immediate_wraps_accumulator(dut):
+    """ALU SUB-immediate must update the accumulator with eight-bit wraparound."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0x03; ALU SUB,0x07; OUTA; HALT.
+    for instruction in (0x5003, 0x7607, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xFC
+
+
+@cocotb.test()
 async def test_alu_or_immediate_sets_accumulator_bits(dut):
     """ALU OR-immediate must set accumulator bits for later output."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())

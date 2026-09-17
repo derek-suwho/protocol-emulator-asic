@@ -70,6 +70,11 @@ def alu_shr(amount: int) -> int:
     return 0x7500 | _checked(amount, 3, "ALU SHR operand")
 
 
+def alu_sub(value: int) -> int:
+    """Encode ALU SUB,imm8."""
+    return 0x7600 | _checked(value, 8, "ALU SUB operand")
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")
