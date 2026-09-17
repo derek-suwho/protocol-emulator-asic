@@ -70,7 +70,7 @@ changes.
 | `A` | `JNZ addr6` | `[5:0]` | Branch when accumulator is nonzero |
 | `B` | `JPIN pin,value,addr6` | `[11:9]`, `[8]`, `[5:0]` | Branch when the selected live protocol pin matches `value` |
 | `C` | `OUTA` | — | Copy accumulator to protocol output register |
-| `D` | `OUTBIT pin` | `[2:0]` | Copy accumulator bit zero to one selected protocol output, preserving the other outputs |
+| `D` | `OUTBIT pin,bit` | `[2:0]`, `[5:3]` | Copy one selected accumulator bit to one selected protocol output, preserving the other outputs |
 | `E` | reserved | — | Reserved for verification-driven extensions |
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 

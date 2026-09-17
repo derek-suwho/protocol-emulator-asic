@@ -186,7 +186,7 @@ module tt_um_derek_su_protocol_emulator (
           pc <= pc + 1'b1;
         end
         OP_OUTBIT: begin
-          pin_out[imem[pc][2:0]] <= accumulator[0];
+          pin_out[imem[pc][2:0]] <= accumulator[imem[pc][5:3]];
           pc <= pc + 1'b1;
         end
         OP_HALT: begin

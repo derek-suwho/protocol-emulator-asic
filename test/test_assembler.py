@@ -41,6 +41,7 @@ def test_encodes_accumulator_data_instructions():
     assert jpin(2, 1, 3) == 0xB503
     assert outa() == 0xC000
     assert outbit(7) == 0xD007
+    assert outbit(2, source_bit=7) == 0xD03A
 
 
 @pytest.mark.parametrize(
@@ -88,6 +89,8 @@ def test_encodes_accumulator_data_instructions():
         (lambda operand: jpin(0, 0, operand), 0x40),
         (outbit, -1),
         (outbit, 8),
+        (lambda operand: outbit(0, source_bit=operand), -1),
+        (lambda operand: outbit(0, source_bit=operand), 8),
     ],
 )
 def test_rejects_operands_that_do_not_fit(encoder, operand):
