@@ -105,6 +105,11 @@ def alu_rev() -> int:
     return 0x7C00
 
 
+def alu_swap() -> int:
+    """Encode ALU SWAP (exchange accumulator nibbles)."""
+    return 0x7D00
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")

@@ -391,6 +391,23 @@ async def test_alu_bit_reverse_reorders_accumulator_bits(dut):
 
 
 @cocotb.test()
+async def test_alu_nibble_swap_exchanges_accumulator_halves(dut):
+    """ALU SWAP must exchange the accumulator's upper and lower nibbles."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0xA5; ALU SWAP; OUTA; HALT. Swapping nibbles produces 0x5A.
+    for instruction in (0x50A5, 0x7D00, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0x5A
+
+
+@cocotb.test()
 async def test_alu_and_immediate_masks_accumulator(dut):
     """ALU AND-immediate must mask the accumulator for later output."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
