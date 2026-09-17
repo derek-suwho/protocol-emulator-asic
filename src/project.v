@@ -47,6 +47,7 @@ module tt_um_derek_su_protocol_emulator (
   reg [7:0]  pin_oe;
   reg [7:0]  accumulator;
   reg        halted;
+  reg        running;
 
   wire cfg_data   = ui_in[0];
   wire cfg_shift  = ui_in[1];
@@ -67,7 +68,8 @@ module tt_um_derek_su_protocol_emulator (
       pin_oe         <= 8'b0;
       accumulator    <= 8'b0;
       halted         <= 1'b0;
-    end else if (!run) begin
+      running        <= 1'b0;
+    end else if (!run && !running) begin
       pc     <= 6'b0;
       wait_count <= 12'b0;
       halted <= 1'b0;
@@ -80,8 +82,10 @@ module tt_um_derek_su_protocol_emulator (
         cfg_addr <= cfg_addr + 1'b1;
       end
     end else if (ena && !halted && (wait_count != 0)) begin
+      running <= 1'b1;
       wait_count <= wait_count - 1'b1;
     end else if (ena && !halted) begin
+      running <= 1'b1;
       case (imem[pc][15:12])
         OP_OUT: begin
           pin_out <= imem[pc][7:0];
@@ -156,6 +160,11 @@ module tt_um_derek_su_protocol_emulator (
           pc <= pc + 1'b1;
         end
       endcase
+    end else if (halted && !run) begin
+      pc <= 6'b0;
+      wait_count <= 12'b0;
+      halted <= 1'b0;
+      running <= 1'b0;
     end
   end
 

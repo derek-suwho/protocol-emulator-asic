@@ -6,8 +6,10 @@ implemented and tested. Firmware can sample an external or host byte, transform
 it with AND-immediate, OR-immediate, XOR-immediate, wrapping ADD/SUB-immediate, or logical shifts, and later drive the retained value
 onto the protocol pins. A firmware-only UART transmitter has produced a verified
 8N1 frame for byte `0x55` with exact four-clock bit periods. The assembler can
-also emit 33-word UART programs that sample a byte from either the protocol pins
-or host bus at runtime, then transmit it LSB-first on protocol pin 0.
+also emit UART programs that sample a byte from either the protocol pins or host
+bus at runtime, then transmit it LSB-first on protocol pin 0. Pin input uses 33
+words; host input uses a leading `NOP` and 34 words so `run` can be pulsed before
+all eight host-input bits carry data.
 
 ## Design goals
 
@@ -39,7 +41,10 @@ The eight bidirectional `uio` pins are the emulated protocol pins. While `run`
 is low, the processor is stopped at address zero and the host loads 16-bit
 instructions through `cfg_data`, `cfg_shift`, and `cfg_commit`. Bits are shifted
 least-significant first. Each `cfg_commit` pulse writes one word and advances
-the configuration address. Raising `run` starts execution at address zero.
+the configuration address. Raising `run` starts execution at address zero and
+latches the processor in its running state, allowing all eight `ui_in` bits to
+carry host data on following cycles. After `HALT`, lowering `run` returns to
+configuration mode.
 
 The dedicated output bus reports `{halted, 1'b0, pc[5:0]}` during development.
 This debug mapping may be replaced with host handshaking before tapeout.

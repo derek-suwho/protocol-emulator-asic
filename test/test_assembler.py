@@ -108,7 +108,7 @@ def test_generates_uart_8n1_firmware_for_runtime_host_byte():
     assert hasattr(assembler, "uart_tx8n1_from_host")
 
     program = assembler.uart_tx8n1_from_host(tx_mask=0x01, bit_ticks=4)
-    expected = [host(), oe(0x01), out(0x01), wait(2)]
+    expected = [0x0000, host(), oe(0x01), out(0x01), wait(2)]
     expected.extend((out(0), wait(1), alu_shr(0)))
     for _ in range(8):
         expected.extend((outa(), wait(1), alu_shr(1)))

@@ -184,6 +184,26 @@ async def test_host_samples_runtime_byte_for_later_firmware_output(dut):
 
 
 @cocotb.test()
+async def test_run_pulse_allows_host_to_sample_byte_with_bit3_clear(dut):
+    """Once started, execution must continue while host data drives run low."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # NOP gives the host one cycle to replace the run pulse with runtime data.
+    for instruction in (0x0000, 0x6000, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3  # Pulse run for NOP.
+    await RisingEdge(dut.clk)
+    dut.ui_in.value = 0xA5  # Runtime byte has bit 3 clear.
+    await RisingEdge(dut.clk)  # HOST
+    await RisingEdge(dut.clk)  # OUTA
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xA5
+
+
+@cocotb.test()
 async def test_alu_xor_immediate_updates_accumulator(dut):
     """ALU XOR-immediate must update the accumulator consumed by OUTA."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
