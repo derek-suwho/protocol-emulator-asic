@@ -41,6 +41,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] ALU_ROL = 4'h8;
   localparam [3:0] ALU_NOT = 4'h9;
   localparam [3:0] ALU_NEG = 4'ha;
+  localparam [3:0] ALU_ASR = 4'hb;
 
   reg [15:0] imem [0:63];
   reg [15:0] cfg_shift_reg;
@@ -138,6 +139,8 @@ module tt_um_derek_su_protocol_emulator (
             accumulator <= ~accumulator;
           else if (imem[pc][11:8] == ALU_NEG)
             accumulator <= -accumulator;
+          else if (imem[pc][11:8] == ALU_ASR)
+            accumulator <= $signed(accumulator) >>> imem[pc][2:0];
           pc <= pc + 1'b1;
         end
         OP_JMP: begin

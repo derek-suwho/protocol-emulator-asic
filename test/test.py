@@ -357,6 +357,23 @@ async def test_alu_neg_twos_complements_accumulator(dut):
 
 
 @cocotb.test()
+async def test_alu_arithmetic_shift_right_preserves_sign(dut):
+    """ALU ASR-immediate must shift right while retaining the accumulator sign."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0x80; ALU ASR,1; OUTA; HALT. Arithmetic shift produces 0xC0.
+    for instruction in (0x5080, 0x7B01, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xC0
+
+
+@cocotb.test()
 async def test_alu_and_immediate_masks_accumulator(dut):
     """ALU AND-immediate must mask the accumulator for later output."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())

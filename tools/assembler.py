@@ -95,6 +95,11 @@ def alu_neg() -> int:
     return 0x7A00
 
 
+def alu_asr(amount: int) -> int:
+    """Encode ALU arithmetic shift-right by a three-bit immediate."""
+    return 0x7B00 | _checked(amount, 3, "ALU ASR operand")
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")
