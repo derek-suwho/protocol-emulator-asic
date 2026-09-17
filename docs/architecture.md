@@ -1,9 +1,9 @@
 # Protocol Emulator Architecture
 
 Status: draft v0.3 — the loader plus `OUT`, `OE`, `WAIT`, `IN`, `LDI`,
-`HOST`, `ALU AND`, `ALU OR`, `ALU XOR`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `JPIN`, `OUTA`, and `HALT` are
+`HOST`, `ALU AND`, `ALU OR`, `ALU XOR`, `ALU ADD`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `JPIN`, `OUTA`, and `HALT` are
 implemented and tested. Firmware can sample an external or host byte, transform
-it with AND-immediate, OR-immediate, XOR-immediate, or logical shifts, and later drive the retained value
+it with AND-immediate, OR-immediate, XOR-immediate, ADD-immediate, or logical shifts, and later drive the retained value
 onto the protocol pins. A firmware-only UART transmitter has produced a verified
 8N1 frame for byte `0x55` with exact four-clock bit periods.
 
@@ -57,7 +57,7 @@ changes.
 | `4` | `IN` | — | Sample protocol inputs into accumulator |
 | `5` | `LDI imm8` | `[7:0]` | Load accumulator immediate |
 | `6` | `HOST` | — | Sample host input byte into accumulator |
-| `7` | `ALU fn,imm8` | `[11:8]`, `[7:0]` | Transform accumulator; function `0` is AND-immediate, function `1` is OR-immediate, function `2` is XOR-immediate, and functions `4`/`5` are logical shift-left/right by `[2:0]` |
+| `7` | `ALU fn,imm8` | `[11:8]`, `[7:0]` | Transform accumulator; functions `0`–`3` are AND, OR, XOR, and wrapping ADD immediate, and functions `4`/`5` are logical shift-left/right by `[2:0]` |
 | `8` | `JMP addr6` | `[5:0]` | Unconditional branch |
 | `9` | `JZ addr6` | `[5:0]` | Branch when accumulator is zero |
 | `A` | `JNZ addr6` | `[5:0]` | Branch when accumulator is nonzero |
@@ -68,7 +68,7 @@ changes.
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 
 `OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. `IN`, `LDI`, `ALU XOR`,
-`HOST`, `ALU AND`, `ALU OR`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `JPIN`, and `OUTA` are implemented in draft
+`HOST`, `ALU AND`, `ALU OR`, `ALU ADD`, `ALU SHL`, `ALU SHR`, `JMP`, `JZ`, `JNZ`, `JPIN`, and `OUTA` are implemented in draft
 v0.3. Every additional operation will be added through a failing behavioral test
 before RTL implementation.
 Unimplemented ALU function values advance the PC without changing the

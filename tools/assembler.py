@@ -55,6 +55,11 @@ def alu_xor(value: int) -> int:
     return 0x7200 | _checked(value, 8, "ALU XOR operand")
 
 
+def alu_add(value: int) -> int:
+    """Encode ALU ADD,imm8."""
+    return 0x7300 | _checked(value, 8, "ALU ADD operand")
+
+
 def alu_shl(amount: int) -> int:
     """Encode ALU logical shift-left by a three-bit immediate."""
     return 0x7400 | _checked(amount, 3, "ALU SHL operand")
