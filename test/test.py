@@ -340,6 +340,23 @@ async def test_alu_not_inverts_accumulator_bits(dut):
 
 
 @cocotb.test()
+async def test_alu_neg_twos_complements_accumulator(dut):
+    """ALU NEG must form the accumulator's eight-bit two's complement."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0x05; ALU NEG; OUTA; HALT.
+    for instruction in (0x5005, 0x7A00, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0xFB
+
+
+@cocotb.test()
 async def test_alu_and_immediate_masks_accumulator(dut):
     """ALU AND-immediate must mask the accumulator for later output."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())

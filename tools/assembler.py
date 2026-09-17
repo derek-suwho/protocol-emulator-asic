@@ -90,6 +90,11 @@ def alu_not() -> int:
     return 0x7900
 
 
+def alu_neg() -> int:
+    """Encode ALU NEG (eight-bit two's complement)."""
+    return 0x7A00
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")
