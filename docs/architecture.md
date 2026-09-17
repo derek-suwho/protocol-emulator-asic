@@ -1,7 +1,7 @@
 # Protocol Emulator Architecture
 
 Status: draft v0.3 — the loader plus `OUT`, `OE`, `WAIT`, `IN`, `LDI`,
-`HOST`, `ALU AND`, `ALU OR`, `ALU XOR`, `ALU ADD`, `ALU SUB`, `ALU SHL`, `ALU SHR`, `ALU ASR`, `ALU ROR`, `ALU ROL`, `ALU NOT`, `ALU NEG`, `ALU REV`, `ALU SWAP`, `ALU POPCNT`, `ALU PARITY`, `JMP`, `JZ`, `JNZ`, `JPIN`, `OUTA`, `OUTBIT`, and `HALT` are
+`HOST`, `ALU AND`, `ALU OR`, `ALU XOR`, `ALU ADD`, `ALU SUB`, `ALU SHL`, `ALU SHR`, `ALU ASR`, `ALU ROR`, `ALU ROL`, `ALU NOT`, `ALU NEG`, `ALU REV`, `ALU SWAP`, `ALU POPCNT`, `ALU PARITY`, `JMP`, `JZ`, `JNZ`, `JPIN`, `OUTA`, `OUTBIT`, `OEA`, and `HALT` are
 implemented and tested. Firmware can sample an external or host byte, transform
 it with AND-immediate, OR-immediate, XOR-immediate, wrapping ADD/SUB-immediate, logical or arithmetic shifts, rotates, bitwise inversion, two's-complement negation, bit-order reversal, nibble swapping, population count, or parity reduction, and later drive the retained value
 onto the protocol pins. A firmware-only UART transmitter has produced a verified
@@ -71,11 +71,11 @@ changes.
 | `B` | `JPIN pin,value,addr6` | `[11:9]`, `[8]`, `[5:0]` | Branch when the selected live protocol pin matches `value` |
 | `C` | `OUTA` | — | Copy accumulator to protocol output register |
 | `D` | `OUTBIT pin,bit` | `[2:0]`, `[5:3]` | Copy one selected accumulator bit to one selected protocol output, preserving the other outputs |
-| `E` | reserved | — | Reserved for verification-driven extensions |
+| `E` | `OEA` | — | Copy accumulator to protocol output-enable register |
 | `F` | `HALT` | — | Stop until `run` is lowered or reset is asserted |
 
 `OUT`, `OE`, `WAIT`, and `HALT` are frozen in v0.2. `IN`, `LDI`, `ALU XOR`,
-`HOST`, `ALU AND`, `ALU OR`, `ALU ADD`, `ALU SUB`, `ALU SHL`, `ALU SHR`, `ALU ASR`, `ALU ROR`, `ALU ROL`, `ALU NOT`, `ALU NEG`, `ALU REV`, `ALU SWAP`, `ALU POPCNT`, `ALU PARITY`, `JMP`, `JZ`, `JNZ`, `JPIN`, `OUTA`, and `OUTBIT` are implemented in draft
+`HOST`, `ALU AND`, `ALU OR`, `ALU ADD`, `ALU SUB`, `ALU SHL`, `ALU SHR`, `ALU ASR`, `ALU ROR`, `ALU ROL`, `ALU NOT`, `ALU NEG`, `ALU REV`, `ALU SWAP`, `ALU POPCNT`, `ALU PARITY`, `JMP`, `JZ`, `JNZ`, `JPIN`, `OUTA`, `OUTBIT`, and `OEA` are implemented in draft
 v0.3. Every additional operation will be added through a failing behavioral test
 before RTL implementation.
 

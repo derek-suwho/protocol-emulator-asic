@@ -4,7 +4,7 @@
 import pytest
 
 from tools import assembler
-from tools.assembler import alu_add, alu_and, alu_asr, alu_neg, alu_not, alu_or, alu_parity, alu_popcnt, alu_rev, alu_rol, alu_ror, alu_shl, alu_shr, alu_sub, alu_swap, alu_xor, halt, host, inp, jmp, jnz, jpin, jz, ldi, oe, out, outa, outbit, uart_tx8n1, wait
+from tools.assembler import alu_add, alu_and, alu_asr, alu_neg, alu_not, alu_or, alu_parity, alu_popcnt, alu_rev, alu_rol, alu_ror, alu_shl, alu_shr, alu_sub, alu_swap, alu_xor, halt, host, inp, jmp, jnz, jpin, jz, ldi, oe, oea, out, outa, outbit, uart_tx8n1, wait
 
 
 def test_encodes_v02_instructions():
@@ -42,6 +42,7 @@ def test_encodes_accumulator_data_instructions():
     assert outa() == 0xC000
     assert outbit(7) == 0xD007
     assert outbit(2, source_bit=7) == 0xD03A
+    assert oea() == 0xE000
 
 
 @pytest.mark.parametrize(

@@ -159,6 +159,11 @@ def outbit(pin: int, source_bit: int = 0) -> int:
     )
 
 
+def oea() -> int:
+    """Encode OEA (copy accumulator to output-enable register)."""
+    return 0xE000
+
+
 def halt() -> int:
     """Encode HALT."""
     return 0xF000

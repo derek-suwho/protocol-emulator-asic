@@ -29,6 +29,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] OP_JPIN = 4'hb;
   localparam [3:0] OP_OUTA = 4'hc;
   localparam [3:0] OP_OUTBIT = 4'hd;
+  localparam [3:0] OP_OEA  = 4'he;
   localparam [3:0] OP_HALT = 4'hf;
 
   localparam [3:0] ALU_AND = 4'h0;
@@ -187,6 +188,10 @@ module tt_um_derek_su_protocol_emulator (
         end
         OP_OUTBIT: begin
           pin_out[imem[pc][2:0]] <= accumulator[imem[pc][5:3]];
+          pc <= pc + 1'b1;
+        end
+        OP_OEA: begin
+          pin_oe <= accumulator;
           pc <= pc + 1'b1;
         end
         OP_HALT: begin
