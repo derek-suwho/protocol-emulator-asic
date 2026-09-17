@@ -3,6 +3,7 @@
 
 import pytest
 
+from tools import assembler
 from tools.assembler import alu_add, alu_and, alu_or, alu_shl, alu_shr, alu_sub, alu_xor, halt, host, inp, jmp, jnz, jpin, jz, ldi, oe, out, outa, uart_tx8n1, wait
 
 
@@ -84,6 +85,20 @@ def test_generates_uart_8n1_firmware_for_runtime_selected_byte():
     for bit in frame_bits:
         expected.extend((out(bit), wait(2)))
     expected.append(halt())
+
+    assert program == expected
+    assert len(program) <= 64
+
+
+def test_generates_uart_8n1_firmware_for_runtime_pin_byte():
+    assert hasattr(assembler, "uart_tx8n1_from_pins")
+
+    program = assembler.uart_tx8n1_from_pins(tx_mask=0x01, bit_ticks=4)
+    expected = [inp(), oe(0x01), out(0x01), wait(2)]
+    expected.extend((out(0), wait(1), alu_shr(0)))
+    for _ in range(8):
+        expected.extend((outa(), wait(1), alu_shr(1)))
+    expected.extend((out(0x01), halt()))
 
     assert program == expected
     assert len(program) <= 64

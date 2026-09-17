@@ -5,7 +5,9 @@ Status: draft v0.3 — the loader plus `OUT`, `OE`, `WAIT`, `IN`, `LDI`,
 implemented and tested. Firmware can sample an external or host byte, transform
 it with AND-immediate, OR-immediate, XOR-immediate, wrapping ADD/SUB-immediate, or logical shifts, and later drive the retained value
 onto the protocol pins. A firmware-only UART transmitter has produced a verified
-8N1 frame for byte `0x55` with exact four-clock bit periods.
+8N1 frame for byte `0x55` with exact four-clock bit periods. The assembler can
+also emit a 33-word UART program that samples a byte from the protocol pins at
+runtime, then transmits it LSB-first on protocol pin 0.
 
 ## Design goals
 
