@@ -45,6 +45,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] ALU_REV = 4'hc;
   localparam [3:0] ALU_SWAP = 4'hd;
   localparam [3:0] ALU_POPCNT = 4'he;
+  localparam [3:0] ALU_PARITY = 4'hf;
 
   reg [15:0] imem [0:63];
   reg [15:0] cfg_shift_reg;
@@ -154,6 +155,8 @@ module tt_um_derek_su_protocol_emulator (
                            {3'b0, accumulator[2]} + {3'b0, accumulator[3]} +
                            {3'b0, accumulator[4]} + {3'b0, accumulator[5]} +
                            {3'b0, accumulator[6]} + {3'b0, accumulator[7]};
+          else if (imem[pc][11:8] == ALU_PARITY)
+            accumulator <= {7'b0, ^accumulator};
           pc <= pc + 1'b1;
         end
         OP_JMP: begin

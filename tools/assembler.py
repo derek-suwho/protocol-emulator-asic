@@ -115,6 +115,11 @@ def alu_popcnt() -> int:
     return 0x7E00
 
 
+def alu_parity() -> int:
+    """Encode ALU PARITY (reduce accumulator bits with XOR)."""
+    return 0x7F00
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")
