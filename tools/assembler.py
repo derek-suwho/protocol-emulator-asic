@@ -153,3 +153,10 @@ def uart_tx8n1_from_pins(*, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[int
         program.extend((outa(), wait(data_delay), alu_shr(1)))
     program.extend((out(tx_mask), halt()))
     return program
+
+
+def uart_tx8n1_from_host(*, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[int]:
+    """Build firmware that transmits a runtime byte sampled from the host bus."""
+    program = uart_tx8n1_from_pins(tx_mask=tx_mask, bit_ticks=bit_ticks)
+    program[0] = host()
+    return program

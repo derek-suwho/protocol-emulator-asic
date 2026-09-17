@@ -104,6 +104,20 @@ def test_generates_uart_8n1_firmware_for_runtime_pin_byte():
     assert len(program) <= 64
 
 
+def test_generates_uart_8n1_firmware_for_runtime_host_byte():
+    assert hasattr(assembler, "uart_tx8n1_from_host")
+
+    program = assembler.uart_tx8n1_from_host(tx_mask=0x01, bit_ticks=4)
+    expected = [host(), oe(0x01), out(0x01), wait(2)]
+    expected.extend((out(0), wait(1), alu_shr(0)))
+    for _ in range(8):
+        expected.extend((outa(), wait(1), alu_shr(1)))
+    expected.extend((out(0x01), halt()))
+
+    assert program == expected
+    assert len(program) <= 64
+
+
 @pytest.mark.parametrize("bit_ticks", [0, 1])
 def test_uart_rejects_bit_period_too_short_for_out_wait_pair(bit_ticks):
     with pytest.raises(ValueError):
