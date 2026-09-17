@@ -30,6 +30,7 @@ module tt_um_derek_su_protocol_emulator (
   localparam [3:0] OP_HALT = 4'hf;
 
   localparam [3:0] ALU_AND = 4'h0;
+  localparam [3:0] ALU_OR  = 4'h1;
   localparam [3:0] ALU_XOR = 4'h2;
   localparam [3:0] ALU_SHR = 4'h5;
 
@@ -105,6 +106,8 @@ module tt_um_derek_su_protocol_emulator (
         OP_ALU: begin
           if (imem[pc][11:8] == ALU_AND)
             accumulator <= accumulator & imem[pc][7:0];
+          else if (imem[pc][11:8] == ALU_OR)
+            accumulator <= accumulator | imem[pc][7:0];
           else if (imem[pc][11:8] == ALU_XOR)
             accumulator <= accumulator ^ imem[pc][7:0];
           else if (imem[pc][11:8] == ALU_SHR)

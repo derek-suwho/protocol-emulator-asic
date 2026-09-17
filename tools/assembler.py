@@ -45,6 +45,11 @@ def alu_and(value: int) -> int:
     return 0x7000 | _checked(value, 8, "ALU AND operand")
 
 
+def alu_or(value: int) -> int:
+    """Encode ALU OR,imm8."""
+    return 0x7100 | _checked(value, 8, "ALU OR operand")
+
+
 def alu_xor(value: int) -> int:
     """Encode ALU XOR,imm8."""
     return 0x7200 | _checked(value, 8, "ALU XOR operand")
