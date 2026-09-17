@@ -85,6 +85,11 @@ def alu_rol(amount: int) -> int:
     return 0x7800 | _checked(amount, 3, "ALU ROL operand")
 
 
+def alu_not() -> int:
+    """Encode ALU NOT."""
+    return 0x7900
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")
