@@ -110,6 +110,11 @@ def alu_swap() -> int:
     return 0x7D00
 
 
+def alu_popcnt() -> int:
+    """Encode ALU POPCNT (count set accumulator bits)."""
+    return 0x7E00
+
+
 def jmp(address: int) -> int:
     """Encode JMP addr6."""
     return 0x8000 | _checked(address, 6, "JMP address")

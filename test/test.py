@@ -408,6 +408,23 @@ async def test_alu_nibble_swap_exchanges_accumulator_halves(dut):
 
 
 @cocotb.test()
+async def test_alu_population_count_counts_set_bits(dut):
+    """ALU POPCNT must replace the accumulator with its number of set bits."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0xB5; ALU POPCNT; OUTA; HALT. 0xB5 contains five set bits.
+    for instruction in (0x50B5, 0x7E00, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 5
+
+
+@cocotb.test()
 async def test_alu_and_immediate_masks_accumulator(dut):
     """ALU AND-immediate must mask the accumulator for later output."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
