@@ -126,6 +126,19 @@ def test_generates_uart_8n1_firmware_for_runtime_pin_byte():
     assert len(program) <= 64
 
 
+def test_generates_runtime_uart_on_selected_protocol_pin():
+    program = assembler.uart_tx8n1_from_pins(tx_mask=0x08, bit_ticks=4)
+
+    expected = [inp(), oe(0x08), out(0x08), wait(2)]
+    expected.extend((out(0), wait(1), alu_shr(0)))
+    for _ in range(8):
+        expected.extend((outbit(3), wait(1), alu_shr(1)))
+    expected.extend((out(0x08), halt()))
+
+    assert program == expected
+    assert len(program) <= 64
+
+
 def test_generates_uart_8n1_firmware_for_runtime_host_byte():
     assert hasattr(assembler, "uart_tx8n1_from_host")
 

@@ -7,7 +7,7 @@ it with AND-immediate, OR-immediate, XOR-immediate, wrapping ADD/SUB-immediate, 
 onto the protocol pins. A firmware-only UART transmitter has produced a verified
 8N1 frame for byte `0x55` with exact four-clock bit periods. The assembler can
 also emit UART programs that sample a byte from either the protocol pins or host
-bus at runtime, then transmit it LSB-first on protocol pin 0. Pin input uses 33
+bus at runtime, then transmit it LSB-first on any selected protocol pin. Pin input uses 33
 words; host input uses a leading `NOP` and 34 words so `run` can be pulsed before
 all eight host-input bits carry data.
 

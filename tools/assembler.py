@@ -192,24 +192,26 @@ def uart_tx8n1(byte: int, *, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[in
 def uart_tx8n1_from_pins(*, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[int]:
     """Build firmware that transmits a runtime byte sampled from protocol pins.
 
-    The byte is sampled before TX pin 0 becomes an output. Data is sent
+    The byte is sampled before the selected TX pin becomes an output. Data is sent
     least-significant-bit first with exact ``bit_ticks`` periods, and the line
     remains high after HALT.
     """
     tx_mask = _checked(tx_mask, 8, "TX mask")
-    if tx_mask != 0x01:
-        raise ValueError("runtime UART requires TX pin 0")
+    if tx_mask == 0 or tx_mask & (tx_mask - 1):
+        raise ValueError("runtime UART TX mask must select exactly one pin")
     if bit_ticks < 3:
         raise ValueError("bit_ticks must be at least 3 for runtime UART")
 
     data_delay = bit_ticks - 3
+    tx_pin = tx_mask.bit_length() - 1
     program = [inp(), oe(tx_mask), out(tx_mask), wait(bit_ticks - 2)]
 
     # SHRx consumes the third tick in each runtime-generated bit period. A
     # zero-distance shift gives the start bit the same timing as the data bits.
     program.extend((out(0), wait(data_delay), alu_shr(0)))
+    data_output = outa() if tx_pin == 0 else outbit(tx_pin)
     for _ in range(8):
-        program.extend((outa(), wait(data_delay), alu_shr(1)))
+        program.extend((data_output, wait(data_delay), alu_shr(1)))
     program.extend((out(tx_mask), halt()))
     return program
 
