@@ -374,6 +374,23 @@ async def test_alu_arithmetic_shift_right_preserves_sign(dut):
 
 
 @cocotb.test()
+async def test_alu_bit_reverse_reorders_accumulator_bits(dut):
+    """ALU REV must reverse accumulator bit order for wire-order conversion."""
+    cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
+    await reset_dut(dut)
+
+    # LDI 0x96; ALU REV; OUTA; HALT. Reversing 10010110 produces 01101001.
+    for instruction in (0x5096, 0x7C00, 0xC000, 0xF000):
+        await load_instruction_lsb_first(dut, instruction)
+
+    dut.ui_in.value = 1 << 3
+    await ClockCycles(dut.clk, 3)
+    await ReadOnly()
+
+    assert dut.uio_out.value == 0x69
+
+
+@cocotb.test()
 async def test_alu_and_immediate_masks_accumulator(dut):
     """ALU AND-immediate must mask the accumulator for later output."""
     cocotb.start_soon(Clock(dut.clk, CLOCK_PERIOD_US, unit="us").start())
