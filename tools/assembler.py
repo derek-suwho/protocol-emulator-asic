@@ -189,27 +189,33 @@ def uart_tx8n1(byte: int, *, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[in
     return program
 
 
-def uart_tx8n1_from_pins(*, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[int]:
+def uart_tx8n1_from_pins(
+    *, tx_mask: int = 0x01, bit_ticks: int = 4, background_output: int = 0
+) -> list[int]:
     """Build firmware that transmits a runtime byte sampled from protocol pins.
 
     The byte is sampled before the selected TX pin becomes an output. Data is sent
     least-significant-bit first with exact ``bit_ticks`` periods, and the line
-    remains high after HALT.
+    remains high after HALT. Non-TX output values come from ``background_output``
+    throughout the frame.
     """
     tx_mask = _checked(tx_mask, 8, "TX mask")
+    background_output = _checked(background_output, 8, "UART background output")
     if tx_mask == 0 or tx_mask & (tx_mask - 1):
         raise ValueError("runtime UART TX mask must select exactly one pin")
     if bit_ticks < 2:
         raise ValueError("bit_ticks must be at least 2 for runtime UART")
 
     tx_pin = tx_mask.bit_length() - 1
-    program = [inp(), oe(tx_mask), out(tx_mask), wait(bit_ticks - 2)]
+    idle_output = background_output | tx_mask
+    start_output = background_output & ~tx_mask
+    program = [inp(), oe(tx_mask), out(idle_output), wait(bit_ticks - 2)]
 
     # OUTx and SHRx provide two ticks per runtime-generated bit. Longer periods
     # insert a WAIT between them. A zero-distance shift gives the start bit the
     # same timing as the data bits.
     data_delay = bit_ticks - 3
-    program.append(out(0))
+    program.append(out(start_output))
     if bit_ticks > 2:
         program.append(wait(data_delay))
     program.append(alu_shr(0))
@@ -220,7 +226,7 @@ def uart_tx8n1_from_pins(*, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[int
         if bit_ticks > 2:
             program.append(wait(data_delay))
         program.append(alu_shr(1))
-    program.extend((out(tx_mask), halt()))
+    program.extend((out(idle_output), halt()))
     return program
 
 

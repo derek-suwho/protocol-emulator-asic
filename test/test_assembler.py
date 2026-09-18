@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: © 2026 Derek Su
 # SPDX-License-Identifier: Apache-2.0
 
+import inspect
+
 import pytest
 
 from tools import assembler
@@ -169,6 +171,19 @@ def test_generates_uart_8n1_firmware_for_runtime_host_byte():
 
     assert program == expected
     assert len(program) <= 64
+
+
+def test_runtime_uart_preserves_configured_background_outputs():
+    signature = inspect.signature(assembler.uart_tx8n1_from_pins)
+    assert "background_output" in signature.parameters
+
+    program = assembler.uart_tx8n1_from_pins(
+        tx_mask=0x08, bit_ticks=4, background_output=0xA0
+    )
+
+    assert program[2] == out(0xA8)  # Idle-high TX plus background outputs.
+    assert program[4] == out(0xA0)  # Start bit only clears TX.
+    assert program[-2] == out(0xA8)  # Stop/idle restores TX without clearing them.
 
 
 @pytest.mark.parametrize("bit_ticks", [0, 1])
