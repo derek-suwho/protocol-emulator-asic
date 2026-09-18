@@ -199,6 +199,7 @@ def uart_tx8n1_from_pins(
     data_or: int = 0,
     data_xor: int = 0,
     data_add: int = 0,
+    data_sub: int = 0,
 ) -> list[int]:
     """Build firmware that transmits a runtime byte sampled from protocol pins.
 
@@ -216,6 +217,7 @@ def uart_tx8n1_from_pins(
     data_or = _checked(data_or, 8, "UART data OR mask")
     data_xor = _checked(data_xor, 8, "UART data XOR mask")
     data_add = _checked(data_add, 8, "UART data addend")
+    data_sub = _checked(data_sub, 8, "UART data subtrahend")
     if tx_mask == 0 or tx_mask & (tx_mask - 1):
         raise ValueError("runtime UART TX mask must select exactly one pin")
     if bit_ticks < 2:
@@ -233,6 +235,8 @@ def uart_tx8n1_from_pins(
         program.append(alu_xor(data_xor))
     if data_add:
         program.append(alu_add(data_add))
+    if data_sub:
+        program.append(alu_sub(data_sub))
     program.extend((oe(tx_mask | background_oe), out(idle_output), wait(bit_ticks - 2)))
 
     # OUTx and SHRx provide two ticks per runtime-generated bit. Longer periods
