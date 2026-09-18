@@ -257,6 +257,7 @@ def uart_tx8n1_from_host(
     background_output: int = 0,
     background_oe: int = 0,
     data_and: int = 0xFF,
+    data_or: int = 0,
     data_xor: int = 0,
 ) -> list[int]:
     """Build firmware that transmits an optionally transformed runtime host byte."""
@@ -266,6 +267,7 @@ def uart_tx8n1_from_host(
         background_output=background_output,
         background_oe=background_oe,
         data_and=data_and,
+        data_or=data_or,
         data_xor=data_xor,
     )
     program[0] = host()
