@@ -214,7 +214,7 @@ def uart_tx8n1_from_pins(*, tx_mask: int = 0x01, bit_ticks: int = 4) -> list[int
         program.append(wait(data_delay))
     program.append(alu_shr(0))
 
-    data_output = outa() if tx_pin == 0 else outbit(tx_pin)
+    data_output = outbit(tx_pin)
     for _ in range(8):
         program.append(data_output)
         if bit_ticks > 2:

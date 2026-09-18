@@ -119,7 +119,7 @@ def test_generates_uart_8n1_firmware_for_runtime_pin_byte():
     expected = [inp(), oe(0x01), out(0x01), wait(2)]
     expected.extend((out(0), wait(1), alu_shr(0)))
     for _ in range(8):
-        expected.extend((outa(), wait(1), alu_shr(1)))
+        expected.extend((outbit(0), wait(1), alu_shr(1)))
     expected.extend((out(0x01), halt()))
 
     assert program == expected
@@ -137,6 +137,12 @@ def test_generates_runtime_uart_on_selected_protocol_pin():
 
     assert program == expected
     assert len(program) <= 64
+
+
+def test_runtime_uart_on_pin_zero_uses_selected_bit_updates():
+    program = assembler.uart_tx8n1_from_pins(tx_mask=0x01, bit_ticks=4)
+
+    assert program.count(outbit(0)) == 8
 
 
 def test_generates_two_tick_runtime_uart_without_waits_between_bits():
@@ -158,7 +164,7 @@ def test_generates_uart_8n1_firmware_for_runtime_host_byte():
     expected = [0x0000, host(), oe(0x01), out(0x01), wait(2)]
     expected.extend((out(0), wait(1), alu_shr(0)))
     for _ in range(8):
-        expected.extend((outa(), wait(1), alu_shr(1)))
+        expected.extend((outbit(0), wait(1), alu_shr(1)))
     expected.extend((out(0x01), halt()))
 
     assert program == expected
