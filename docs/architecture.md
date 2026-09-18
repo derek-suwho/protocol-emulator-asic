@@ -11,9 +11,9 @@ bus at runtime, then transmit it LSB-first on any selected protocol pin with bit
 periods of two clocks or longer. Pin input uses 24 words at the minimum period
 and 33 words when waits are needed; host input adds a leading `NOP` so `run` can
 be pulsed before all eight host-input bits carry data. Either input source can add
-one word to XOR-transform the sampled byte before transmission. Runtime UART
-firmware can also keep independently selected background pins enabled during the
-frame.
+one word to XOR-transform the sampled byte before transmission. Pin-sampled data
+can instead be masked with one AND-immediate word. Runtime UART firmware can also
+keep independently selected background pins enabled during the frame.
 
 ## Design goals
 

@@ -238,6 +238,17 @@ def test_runtime_pin_uart_xors_sampled_byte_before_transmission():
     assert program[:3] == [inp(), alu_xor(0xFF), oe(0x08)]
 
 
+def test_runtime_pin_uart_masks_sampled_byte_before_transmission():
+    signature = inspect.signature(assembler.uart_tx8n1_from_pins)
+    assert "data_and" in signature.parameters
+
+    program = assembler.uart_tx8n1_from_pins(
+        tx_mask=0x08, bit_ticks=4, data_and=0x0F
+    )
+
+    assert program[:3] == [inp(), alu_and(0x0F), oe(0x08)]
+
+
 def test_runtime_host_uart_xors_sampled_byte_before_transmission():
     signature = inspect.signature(assembler.uart_tx8n1_from_host)
     assert "data_xor" in signature.parameters
