@@ -196,6 +196,7 @@ def uart_tx8n1_from_pins(
     background_output: int = 0,
     background_oe: int = 0,
     data_and: int = 0xFF,
+    data_or: int = 0,
     data_xor: int = 0,
 ) -> list[int]:
     """Build firmware that transmits a runtime byte sampled from protocol pins.
@@ -211,6 +212,7 @@ def uart_tx8n1_from_pins(
     background_output = _checked(background_output, 8, "UART background output")
     background_oe = _checked(background_oe, 8, "UART background output enable")
     data_and = _checked(data_and, 8, "UART data AND mask")
+    data_or = _checked(data_or, 8, "UART data OR mask")
     data_xor = _checked(data_xor, 8, "UART data XOR mask")
     if tx_mask == 0 or tx_mask & (tx_mask - 1):
         raise ValueError("runtime UART TX mask must select exactly one pin")
@@ -223,6 +225,8 @@ def uart_tx8n1_from_pins(
     program = [inp()]
     if data_and != 0xFF:
         program.append(alu_and(data_and))
+    if data_or:
+        program.append(alu_or(data_or))
     if data_xor:
         program.append(alu_xor(data_xor))
     program.extend((oe(tx_mask | background_oe), out(idle_output), wait(bit_ticks - 2)))
