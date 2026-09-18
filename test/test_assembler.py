@@ -186,6 +186,20 @@ def test_runtime_host_uart_preserves_configured_background_outputs():
     assert program[-2] == out(0xA8)  # Stop/idle restores TX without clearing them.
 
 
+def test_runtime_host_uart_enables_configured_background_outputs():
+    signature = inspect.signature(assembler.uart_tx8n1_from_host)
+    assert "background_oe" in signature.parameters
+
+    program = assembler.uart_tx8n1_from_host(
+        tx_mask=0x08,
+        bit_ticks=4,
+        background_output=0xA0,
+        background_oe=0xA4,
+    )
+
+    assert program[2] == oe(0xAC)
+
+
 def test_runtime_uart_preserves_configured_background_outputs():
     signature = inspect.signature(assembler.uart_tx8n1_from_pins)
     assert "background_output" in signature.parameters
