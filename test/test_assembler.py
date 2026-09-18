@@ -227,6 +227,17 @@ def test_runtime_pin_uart_enables_configured_background_outputs():
     assert program[1] == oe(0xAC)
 
 
+def test_runtime_pin_uart_xors_sampled_byte_before_transmission():
+    signature = inspect.signature(assembler.uart_tx8n1_from_pins)
+    assert "data_xor" in signature.parameters
+
+    program = assembler.uart_tx8n1_from_pins(
+        tx_mask=0x08, bit_ticks=4, data_xor=0xFF
+    )
+
+    assert program[:3] == [inp(), alu_xor(0xFF), oe(0x08)]
+
+
 @pytest.mark.parametrize("bit_ticks", [0, 1])
 def test_uart_rejects_bit_period_too_short_for_out_wait_pair(bit_ticks):
     with pytest.raises(ValueError):

@@ -195,17 +195,20 @@ def uart_tx8n1_from_pins(
     bit_ticks: int = 4,
     background_output: int = 0,
     background_oe: int = 0,
+    data_xor: int = 0,
 ) -> list[int]:
     """Build firmware that transmits a runtime byte sampled from protocol pins.
 
     The byte is sampled before the selected TX pin becomes an output. Data is sent
     least-significant-bit first with exact ``bit_ticks`` periods, and the line
-    remains high after HALT. Non-TX output values come from ``background_output``
+    remains high after HALT. ``data_xor`` optionally transforms the sampled byte
+    before transmission. Non-TX output values come from ``background_output``
     throughout the frame, and ``background_oe`` keeps selected non-TX pins driven.
     """
     tx_mask = _checked(tx_mask, 8, "TX mask")
     background_output = _checked(background_output, 8, "UART background output")
     background_oe = _checked(background_oe, 8, "UART background output enable")
+    data_xor = _checked(data_xor, 8, "UART data XOR mask")
     if tx_mask == 0 or tx_mask & (tx_mask - 1):
         raise ValueError("runtime UART TX mask must select exactly one pin")
     if bit_ticks < 2:
@@ -214,7 +217,10 @@ def uart_tx8n1_from_pins(
     tx_pin = tx_mask.bit_length() - 1
     idle_output = background_output | tx_mask
     start_output = background_output & ~tx_mask
-    program = [inp(), oe(tx_mask | background_oe), out(idle_output), wait(bit_ticks - 2)]
+    program = [inp()]
+    if data_xor:
+        program.append(alu_xor(data_xor))
+    program.extend((oe(tx_mask | background_oe), out(idle_output), wait(bit_ticks - 2)))
 
     # OUTx and SHRx provide two ticks per runtime-generated bit. Longer periods
     # insert a WAIT between them. A zero-distance shift gives the start bit the
