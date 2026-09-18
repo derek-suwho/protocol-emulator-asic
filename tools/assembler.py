@@ -247,13 +247,15 @@ def uart_tx8n1_from_host(
     bit_ticks: int = 4,
     background_output: int = 0,
     background_oe: int = 0,
+    data_xor: int = 0,
 ) -> list[int]:
-    """Build firmware that transmits a runtime byte sampled from the host bus."""
+    """Build firmware that transmits an optionally XORed runtime host byte."""
     program = uart_tx8n1_from_pins(
         tx_mask=tx_mask,
         bit_ticks=bit_ticks,
         background_output=background_output,
         background_oe=background_oe,
+        data_xor=data_xor,
     )
     program[0] = host()
     # Start with a NOP so run can be pulsed before all eight ui_in bits carry data.
