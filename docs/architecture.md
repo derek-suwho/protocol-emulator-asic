@@ -10,7 +10,8 @@ also emit UART programs that sample a byte from either the protocol pins or host
 bus at runtime, then transmit it LSB-first on any selected protocol pin with bit
 periods of two clocks or longer. Pin input uses 24 words at the minimum period
 and 33 words when waits are needed; host input adds a leading `NOP` so `run` can
-be pulsed before all eight host-input bits carry data.
+be pulsed before all eight host-input bits carry data. Pin-sampled UART firmware
+can also keep independently selected background pins enabled during the frame.
 
 ## Design goals
 
