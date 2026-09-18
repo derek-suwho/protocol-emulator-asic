@@ -12,9 +12,8 @@ periods of two clocks or longer. Pin input uses 24 words at the minimum period
 and 33 words when waits are needed; host input adds a leading `NOP` so `run` can
 be pulsed before all eight host-input bits carry data. Either input source can add
 one word to mask the sampled byte with AND-immediate, set selected bits with
-OR-immediate, XOR-transform it, or add an immediate offset with eight-bit
-wraparound before transmission. Pin-sampled UART firmware can also subtract an
-immediate offset with eight-bit wraparound. Runtime
+OR-immediate, XOR-transform it, or add or subtract an immediate offset with
+eight-bit wraparound before transmission. Runtime
 UART firmware can keep independently selected background pins enabled during the
 frame.
 

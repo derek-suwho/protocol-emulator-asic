@@ -326,6 +326,17 @@ def test_runtime_host_uart_adds_to_sampled_byte_before_transmission():
     assert program[:4] == [0x0000, host(), alu_add(0x13), oe(0x08)]
 
 
+def test_runtime_host_uart_subtracts_from_sampled_byte_before_transmission():
+    signature = inspect.signature(assembler.uart_tx8n1_from_host)
+    assert "data_sub" in signature.parameters
+
+    program = assembler.uart_tx8n1_from_host(
+        tx_mask=0x08, bit_ticks=4, data_sub=0x13
+    )
+
+    assert program[:4] == [0x0000, host(), alu_sub(0x13), oe(0x08)]
+
+
 @pytest.mark.parametrize("bit_ticks", [0, 1])
 def test_uart_rejects_bit_period_too_short_for_out_wait_pair(bit_ticks):
     with pytest.raises(ValueError):
