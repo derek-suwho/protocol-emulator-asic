@@ -260,6 +260,17 @@ def test_runtime_pin_uart_sets_sampled_byte_bits_before_transmission():
     assert program[:3] == [inp(), alu_or(0xA0), oe(0x08)]
 
 
+def test_runtime_pin_uart_adds_to_sampled_byte_before_transmission():
+    signature = inspect.signature(assembler.uart_tx8n1_from_pins)
+    assert "data_add" in signature.parameters
+
+    program = assembler.uart_tx8n1_from_pins(
+        tx_mask=0x08, bit_ticks=4, data_add=0x13
+    )
+
+    assert program[:3] == [inp(), alu_add(0x13), oe(0x08)]
+
+
 def test_runtime_host_uart_xors_sampled_byte_before_transmission():
     signature = inspect.signature(assembler.uart_tx8n1_from_host)
     assert "data_xor" in signature.parameters
